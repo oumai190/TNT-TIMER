@@ -11,3 +11,7 @@ dependencies {
 labyModAnnotationProcessor {
     referenceType = ReferenceType.DEFAULT
 }
+
+tasks.processResources {
+    from(layout.projectDirectory.file("src/main/resources/assets/tnttimer/pack.png"))
+}
