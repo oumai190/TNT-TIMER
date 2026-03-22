@@ -21,7 +21,7 @@ labyMod {
     }
 
     addonInfo {
-        namespace = "tnttimer"
+        namespace = "tnttimers"
         displayName = "TNT Timer"
         author = "maghribia"
         description = "Client-side fuse timer above primed TNT."

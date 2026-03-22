@@ -13,5 +13,5 @@ labyModAnnotationProcessor {
 }
 
 tasks.processResources {
-    from(layout.projectDirectory.file("src/main/resources/assets/tnttimer/pack.png"))
+    from(layout.projectDirectory.file("src/main/resources/assets/tnttimers/pack.png"))
 }

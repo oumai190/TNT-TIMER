@@ -1,0 +1,15 @@
+{
+  "tnttimers": {
+    "settings": {
+      "enabled": {
+        "name": "Enabled"
+      },
+      "dynamicColors": {
+        "name": "Dynamic colors"
+      },
+      "staticTextColor": {
+        "name": "Text color"
+      }
+    }
+  }
+}
