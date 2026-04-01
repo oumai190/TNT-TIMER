@@ -16,6 +16,7 @@ import net.labymod.api.client.world.MinecraftCamera;
 import net.labymod.api.event.Phase;
 import net.labymod.api.event.Subscribe;
 import net.labymod.api.event.client.render.world.RenderWorldEvent;
+import net.labymod.api.laby3d.Laby3D;
 import net.labymod.api.util.math.vector.DoubleVector3;
 import org.example.core.TntTimerAddon;
 import org.example.core.TntTimerConfiguration;
@@ -66,43 +67,45 @@ public class TntTimerWorldListener {
     float pitch = camera.getPitch() * (frontThird ? -1f : 1f);
     Stack stack = event.stack();
 
-    Laby.gfx()
-        .storeAndRestoreBlaze3DStates(
-            () -> {
-              for (Entity entity : world.getEntities()) {
-                if (!(entity instanceof PrimedTnt tnt)) {
-                  continue;
-                }
-                if (entity.getDistanceSquared(player) > MAX_DIST_SQ) {
-                  continue;
-                }
-                float ticks = tnt.getFuse() - pt;
-                if (ticks < 1f) {
-                  continue;
-                }
-                float h = (float) entity.axisAlignedBoundingBox().getHeight();
-                var cur = entity.position();
-                var prev = entity.previousPosition();
-                double x = prev.lerpX(cur, pt) - cam.getX();
-                double y =
-                    prev.lerpY(cur, pt) - cam.getY() + h + 0.5 + (mc1165 ? 0.12 : 0.0);
-                double z = prev.lerpZ(cur, pt) - cam.getZ();
-                String text = String.format(Locale.US, "%.2f", ticks / 20f);
-                Component line = coloredLine(text, ticks, cfg);
-                float w = pipeline.textRenderer().getWidth(line);
+    Laby3D laby3d = Laby.references().laby3D();
+    laby3d.storeStates();
+    try {
+      for (Entity entity : world.getEntities()) {
+        if (!(entity instanceof PrimedTnt tnt)) {
+          continue;
+        }
+        if (entity.getDistanceSquared(player) > MAX_DIST_SQ) {
+          continue;
+        }
+        float ticks = tnt.getFuse() - pt;
+        if (ticks < 1f) {
+          continue;
+        }
+        float h = (float) entity.axisAlignedBoundingBox().getHeight();
+        var cur = entity.position();
+        var prev = entity.previousPosition();
+        double x = prev.lerpX(cur, pt) - cam.getX();
+        double y =
+            prev.lerpY(cur, pt) - cam.getY() + h + 0.5 + (mc1165 ? 0.12 : 0.0);
+        double z = prev.lerpZ(cur, pt) - cam.getZ();
+        String text = String.format(Locale.US, "%.2f", ticks / 20f);
+        Component line = coloredLine(text, ticks, cfg);
+        float w = pipeline.textRenderer().getWidth(line);
 
-                stack.push();
-                stack.translate((float) x, (float) y, (float) z);
-                stack.rotate(-camera.getYaw(), 0f, 1f, 0f);
-                stack.rotate(pitch, 1f, 0f, 0f);
-                stack.scale(-LABEL_SCALE, -LABEL_SCALE, LABEL_SCALE);
-                Matrix4f pose = stack.getProvider().getPose();
-                pipeline
-                    .textRenderer()
-                    .render(pose, line, -w / 2f, 0f, 0xFFFFFFFF, FULL_BRIGHT, FULL_BRIGHT, FULL_BRIGHT);
-                stack.pop();
-              }
-            });
+        stack.push();
+        stack.translate((float) x, (float) y, (float) z);
+        stack.rotate(-camera.getYaw(), 0f, 1f, 0f);
+        stack.rotate(pitch, 1f, 0f, 0f);
+        stack.scale(-LABEL_SCALE, -LABEL_SCALE, LABEL_SCALE);
+        Matrix4f pose = stack.getProvider().getPose();
+        pipeline
+            .textRenderer()
+            .render(pose, line, -w / 2f, 0f, 0xFFFFFFFF, FULL_BRIGHT, FULL_BRIGHT, FULL_BRIGHT);
+        stack.pop();
+      }
+    } finally {
+      laby3d.restoreStates();
+    }
   }
 
   private static boolean minecraftVersionStartsWith(Minecraft mc, String prefix) {
